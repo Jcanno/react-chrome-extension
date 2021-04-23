@@ -1,20 +1,44 @@
 const path = require('path');
-const entryPath = path.resolve(__dirname, 'src/index.tsx');
 const outputPath = path.resolve(__dirname, 'dist');
-const htmlPath = path.resolve(__dirname, 'public/index.html');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const WebpackBar = require('webpackbar')
+const fs = require('fs')
+const CopyWebpackPlugin = require("copy-webpack-plugin")
+
+// 只需要复制的文件
+const copyFiles = [
+  {
+    from: path.resolve("src/manifest.json"),
+    to: `${path.resolve("dist")}`
+  },
+  {
+    from: path.resolve("assets"),
+    to: path.resolve("dist/assets")
+  },
+	{
+    from: path.resolve("src/popup/index.html"),
+    to: path.resolve("dist/popup/index.html")
+  },
+	{
+    from: path.resolve("src/devtools/index.html"),
+    to: path.resolve("dist/devtools/index.html")
+  }
+];
+
+const packDirs = ['popup', 'devtools', 'inject', 'content', 'background']
+const entry = packDirs.reduce((entry, dir) => {
+	const isTsx = fs.existsSync(`src/${dir}/index.tsx`)
+	entry[`${dir}/index`] = `./src/${dir}/index.${isTsx ? 'tsx' : 'ts'}`
+	return entry
+}, {})
 
 module.exports = {
 	mode: 'production',
-	entry: {
-		app: entryPath
-	},
+	entry,
 	output: {
 		path: outputPath,
-		filename: 'js/[name].js',
+		filename: '[name].js',
 		publicPath: '/'
 	},
 	module: {
@@ -60,12 +84,10 @@ module.exports = {
 		]
 	},
 	plugins: [
-		new WebpackBar(),
-		new HtmlWebpackPlugin({
-			template: htmlPath,
-			filename: 'index.html',
-			minify: true
+		new CopyWebpackPlugin({
+			patterns: copyFiles
 		}),
+		new WebpackBar(),
 		new CleanWebpackPlugin(),
 		new MiniCssExtractPlugin({
 			filename: 'css/[name].[hash:8].css',

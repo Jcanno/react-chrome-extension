@@ -20,12 +20,13 @@
 		"activeTab"
 	],
 	"background": {
-		"scripts": ["js/background.js"]
+		"scripts": ["background/index.js"]
 	},
+	"devtools": "devtools/index.html",
 	"icons": {
-		"16": "assets/logo.png",
-		"48": "assets/logo.png",
-		"128": "assets/logo.png"
+		"16": "assets/react.png",
+		"48": "assets/react.png",
+		"128": "assets/react.png"
 	},
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 	"content_scripts": [
@@ -42,5 +43,5 @@
 			"run_at": "document_end"
 		}
 	],
-	"web_accessible_resources": ["fonts/*", "inject.js"]
+	"web_accessible_resources": ["fonts/*", "inject/index.js"]
 }
