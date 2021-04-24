@@ -5,6 +5,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const WebpackBar = require('webpackbar')
 const fs = require('fs')
 const CopyWebpackPlugin = require("copy-webpack-plugin")
+const HtmlWebpackPlugin = require("html-webpack-plugin")
 
 // 只需要复制的文件
 const copyFiles = [
@@ -16,22 +17,31 @@ const copyFiles = [
     from: path.resolve("assets"),
     to: path.resolve("dist/assets")
   },
-	{
-    from: path.resolve("src/popup/index.html"),
-    to: path.resolve("dist/popup/index.html")
-  },
-	{
-    from: path.resolve("src/devtools/index.html"),
-    to: path.resolve("dist/devtools/index.html")
-  }
 ];
 
-const packDirs = ['popup', 'devtools', 'inject', 'content', 'background']
+const packDirs = ['popup', 'devtools', 'inject', 'content', 'background', 'devtools/panel.tsx']
 const entry = packDirs.reduce((entry, dir) => {
+	if(dir.includes('.')) {
+		entry[dir.slice(0, dir.indexOf('.'))] = `./src/${dir}`
+		return entry
+	}
 	const isTsx = fs.existsSync(`src/${dir}/index.tsx`)
 	entry[`${dir}/index`] = `./src/${dir}/index.${isTsx ? 'tsx' : 'ts'}`
 	return entry
 }, {})
+
+const pages = ['popup', 'devtools', 'devtools/panel.html'].map(page => {
+	const isFullPath = page.includes('.html')
+	const filename = isFullPath ? page : `${page}/index.html`
+	const template = isFullPath ? `src/${page}` : `src/${page}/index.html`
+	const chunks = isFullPath ? [page.slice(0, page.indexOf('.'))] : [`${page}/index`]
+
+	return new HtmlWebpackPlugin({
+		filename,
+		template,
+		chunks
+	})
+})
 
 module.exports = {
 	mode: 'production',
@@ -84,6 +94,10 @@ module.exports = {
 		]
 	},
 	plugins: [
+		// new HtmlWebpackPlugin({
+		// 	template: 'src/popup/index.html'
+		// }),
+		...pages,
 		new CopyWebpackPlugin({
 			patterns: copyFiles
 		}),
