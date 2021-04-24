@@ -7,7 +7,7 @@
   "scripts": {
     "build": "webpack --config=webpack.config.js",
     "dev": "webpack --config=webpack.config.js --watch --no-stats",
-    "crx": "node scripts/crx.ts"
+    "ctx-pack": "crx pack dist"
   },
   "dependencies": {
     "axios": "^0.21.1",

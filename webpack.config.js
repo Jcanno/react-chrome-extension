@@ -94,9 +94,6 @@ module.exports = {
 		]
 	},
 	plugins: [
-		// new HtmlWebpackPlugin({
-		// 	template: 'src/popup/index.html'
-		// }),
 		...pages,
 		new CopyWebpackPlugin({
 			patterns: copyFiles
