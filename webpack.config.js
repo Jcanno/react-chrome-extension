@@ -6,6 +6,7 @@ const WebpackBar = require('webpackbar')
 const fs = require('fs')
 const CopyWebpackPlugin = require("copy-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
+const TerserPlugin = require('terser-webpack-plugin')
 
 // 只需要复制的文件
 const copyFiles = [
@@ -107,5 +108,13 @@ module.exports = {
 	],
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
+  },
+	optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        extractComments: false,
+      }),
+    ],
   }
 };
