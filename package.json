@@ -5,8 +5,8 @@
   "repository": "https://github.com/Jcanno/react-chrome-extension.git",
   "license": "MIT",
   "scripts": {
-    "build": "webpack --config=webpack.config.js",
-    "dev": "webpack --config=webpack.config.js --watch --no-stats",
+    "build": "cross-env NODE_ENV=production webpack --config=webpack.config.js",
+    "dev": "cross-env NODE_ENV=development webpack --config=webpack.config.js --watch --no-stats",
     "crx": "crx pack dist",
     "build:crx": "yarn run build && yarn run crx"
   },
@@ -29,6 +29,7 @@
     "babel-loader": "^8.2.2",
     "clean-webpack-plugin": "^4.0.0-alpha.0",
     "copy-webpack-plugin": "^8.1.1",
+    "cross-env": "^7.0.3",
     "crx": "^5.0.1",
     "css-loader": "^5.2.4",
     "eslint": "^7.24.0",
