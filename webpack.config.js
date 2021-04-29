@@ -3,11 +3,10 @@ const outputPath = path.resolve(__dirname, 'dist');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const WebpackBar = require('webpackbar')
-const fs = require('fs')
 const CopyWebpackPlugin = require("copy-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const TerserPlugin = require('terser-webpack-plugin')
-
+const isDev = process.env.NODE_ENV === 'development'
 // 只需要复制的文件
 const copyFiles = [
   {
@@ -20,15 +19,17 @@ const copyFiles = [
   },
 ];
 
-const packDirs = ['popup', 'devtools', 'inject', 'content', 'background', 'devtools/panel.tsx']
-const entry = packDirs.reduce((entry, dir) => {
-	if(dir.includes('.')) {
-		entry[dir.slice(0, dir.indexOf('.'))] = `./src/${dir}`
-		return entry
-	}
-	const isTsx = fs.existsSync(`src/${dir}/index.tsx`)
-	entry[`${dir}/index`] = `./src/${dir}/index.${isTsx ? 'tsx' : 'ts'}`
-	return entry
+const packDirs = [
+	{ entry: 'popup/index.tsx', output: 'popup/index' },
+	{ entry: 'devtools/index.tsx', output: 'devtools/index' },
+	{ entry: 'inject/index.ts', output: 'inject/index' },
+	{ entry: 'content/index.tsx', output: 'content/index' },
+	{ entry: isDev ? 'background/index-dev.ts' : 'background/index.ts', output: 'background/index' },
+	{ entry: 'devtools/panel.tsx', output: 'devtools/panel' },
+]
+const entry = packDirs.reduce((obj, item) => {
+	obj[item.output] = `./src/${item.entry}`
+	return obj
 }, {})
 
 const pages = ['popup', 'devtools', 'devtools/panel.html'].map(page => {
