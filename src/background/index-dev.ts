@@ -1,3 +1,3 @@
-import installReload from "./hmr"
+import installReload from './hmr'
 
 installReload()

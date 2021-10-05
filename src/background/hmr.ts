@@ -9,22 +9,20 @@ const filesInDirectory = (dir) =>
     dir.createReader().readEntries((entries) => {
       Promise.all(
         entries
-          .filter((e) => e.name[0] !== ".")
+          .filter((e) => e.name[0] !== '.')
           .map((e) =>
-            e.isDirectory
-              ? filesInDirectory(e)
-              : new Promise((resolve) => e.file(resolve))
-          )
+            e.isDirectory ? filesInDirectory(e) : new Promise((resolve) => e.file(resolve)),
+          ),
       )
         .then((files) => [].concat(...files))
         .then(resolve)
-    })
+    }),
   )
 
 // 遍历插件目录，读取文件信息，组合文件名称和修改时间成数据
 const timestampForFilesInDirectory = (dir) =>
   filesInDirectory(dir).then((files: File[]) =>
-    files.map((f) => f.name + f.lastModifiedDate).join()
+    files.map((f) => f.name + f.lastModifiedDate).join(),
   )
 
 // 刷新当前活动页
@@ -41,7 +39,7 @@ const reload = () => {
       }
       // 强制刷新页面
       window.chrome.runtime.reload()
-    }
+    },
   )
 }
 
@@ -60,11 +58,9 @@ const watchChanges = (dir, lastTimestamp) => {
 
 const installReload = () => {
   window.chrome.management.getSelf((self) => {
-    if (self.installType === "development") {
+    if (self.installType === 'development') {
       // 获取插件目录，监听文件变化
-      window.chrome.runtime.getPackageDirectoryEntry((dir) =>
-        watchChanges(dir, null)
-      )
+      window.chrome.runtime.getPackageDirectoryEntry((dir) => watchChanges(dir, null))
     }
   })
 }
