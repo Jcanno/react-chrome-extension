@@ -9,10 +9,7 @@
     "allowJs": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "preserveConstEnums": true,
     "skipLibCheck": true,
-    "importHelpers": true,
-    "baseUrl": "."
   },
   "include": [
     "./src/**/*"

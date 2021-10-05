@@ -1,14 +1,14 @@
 import axios from 'axios'
-import config from '../config'
 import qs from 'qs'
 
+const baseUrl = ''
 class HttpRequest {
   baseUrl: string
 
   constructor(baseUrl) {
     this.baseUrl = baseUrl
   }
-  // 设置请求配置
+  // get request config
   getInsideConfig() {
     const config = {
       baseURL: this.baseUrl,
@@ -38,27 +38,13 @@ class HttpRequest {
     return config
   }
 
-  interceptors(instance) {
-    // 请求拦截
-    instance.interceptors.request.use(
-      (config) => config,
-      (error) => Promise.reject(error),
-    )
-    // 响应拦截
-    instance.interceptors.response.use(
-      (res) => Promise.resolve(res),
-      (error) => Promise.reject(error),
-    )
-  }
-
   request(options) {
     const instance = axios.create()
 
     options = Object.assign(this.getInsideConfig(), options)
-    this.interceptors(instance)
     return instance(options)
   }
 }
-const request = new HttpRequest(config.baseUrl)
+const request = new HttpRequest(baseUrl)
 
 export default request

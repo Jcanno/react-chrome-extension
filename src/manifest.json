@@ -1,11 +1,11 @@
 {
 	"manifest_version": 2,
 	"name": "react-chrome-extension",
-	"description": "基于react的chrome插件",
+	"description": "chrome extension for react",
 	"version": "1.0.0",
 	"browser_action": {
 		"default_title": "react-chrome-extension",
-		"default_icon": "assets/react.png",
+		"default_icon": "assets/logo.png",
 		"default_popup": "popup/index.html"
 	},
 	"permissions": [
@@ -24,14 +24,14 @@
 	},
 	"devtools_page": "devtools/index.html",
 	"icons": {
-		"16": "assets/react.png",
-		"48": "assets/react.png",
-		"128": "assets/react.png"
+		"16": "assets/logo.png",
+		"48": "assets/logo.png",
+		"128": "assets/logo.png"
 	},
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 	"content_scripts": [{
 		"matches": [
-			"https://*.baidu.com/*"
+			"https://www.google.com/"
 		],
 		"js": [
 			"content/index.js"

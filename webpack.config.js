@@ -7,8 +7,10 @@ const WebpackBar = require('webpackbar')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
+const ExtensionReloader = require('webpack-ext-reloader')
 const isDev = process.env.NODE_ENV === 'development'
-// 只需要复制的文件
+
+// copy file to dist
 const copyFiles = [
   {
     from: path.resolve('src/manifest.json'),
@@ -20,38 +22,51 @@ const copyFiles = [
   },
 ]
 
-const packDirs = [
-  { entry: 'popup/index.tsx', output: 'popup/index' },
-  { entry: 'devtools/index.tsx', output: 'devtools/index' },
-  { entry: 'inject/index.ts', output: 'inject/index' },
-  { entry: 'content/index.tsx', output: 'content/index' },
-  {
-    entry: isDev ? 'background/index-dev.ts' : 'background/index.ts',
-    output: 'background/index',
-  },
-  { entry: 'devtools/panel.tsx', output: 'devtools/panel' },
+// all script entry
+// custom by your need
+const entries = {
+  'popup/index': './src/popup/index.tsx',
+  'devtools/index': './src/devtools/index.tsx',
+  'inject/index': './src/inject/index.ts',
+  'content/index': './src/content/index.tsx',
+  'background/index': './src/background/index.ts',
+  'devtools/panel': './src/devtools/panel.tsx',
+}
+
+// page with html
+// custom by your need
+const pages = [
+  new HtmlWebpackPlugin({
+    filename: 'popup/index.html',
+    template: 'src/popup/index.html',
+    chunks: ['popup/index'],
+  }),
+  new HtmlWebpackPlugin({
+    filename: 'devtools/index.html',
+    template: 'src/devtools/index.html',
+    chunks: ['devtools/index'],
+  }),
+  new HtmlWebpackPlugin({
+    filename: 'devtools/panel.html',
+    template: 'src/devtools/panel.html',
+    chunks: ['devtools/panel'],
+  }),
 ]
-const entry = packDirs.reduce((obj, item) => {
-  obj[item.output] = `./src/${item.entry}`
-  return obj
-}, {})
 
-const pages = ['popup', 'devtools', 'devtools/panel.html'].map((page) => {
-  const isFullPath = page.includes('.html')
-  const filename = isFullPath ? page : `${page}/index.html`
-  const template = isFullPath ? `src/${page}` : `src/${page}/index.html`
-  const chunks = isFullPath ? [page.slice(0, page.indexOf('.'))] : [`${page}/index`]
-
-  return new HtmlWebpackPlugin({
-    filename,
-    template,
-    chunks,
-  })
-})
+// dev hot reload
+// https://github.com/SimplifyJobs/webpack-ext-reloader
+const hotReload = isDev
+  ? [
+      new ExtensionReloader({
+        reloadPage: true,
+        manifest: path.resolve(__dirname, 'src/manifest.json'),
+      }),
+    ]
+  : []
 
 module.exports = {
-  mode: 'production',
-  entry,
+  mode: isDev ? 'development' : 'production',
+  entry: entries,
   output: {
     path: outputPath,
     filename: '[name].js',
@@ -61,12 +76,25 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        use: 'babel-loader',
+        use: {
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true,
+          },
+        },
         exclude: /node_modules/,
       },
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
+            },
+          },
+          'ts-loader',
+        ],
         exclude: /node_modules/,
       },
       {
@@ -82,24 +110,38 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader', 'postcss-loader'],
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+          },
+          'css-loader',
+          'postcss-loader',
+        ],
       },
       {
         test: /\.less$/,
-        use: ['style-loader', 'css-loader', 'postcss-loader', 'less-loader'],
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+          },
+          'css-loader',
+          'postcss-loader',
+          'less-loader',
+        ],
       },
     ],
   },
   plugins: [
     ...pages,
+    ...hotReload,
     new CopyWebpackPlugin({
       patterns: copyFiles,
     }),
     new WebpackBar(),
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
-      filename: 'css/[name].[hash:8].css',
-      chunkFilename: 'css/[name].[chunkhash:8].css',
+      filename: 'css/[name].css',
+      chunkFilename: 'css/[name].css',
     }),
   ],
   resolve: {
