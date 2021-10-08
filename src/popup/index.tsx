@@ -1,6 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import App from './App'
+import './app.less'
+
+function App() {
+  return <div className="App">react chrome extension hello</div>
+}
 
 ReactDOM.render(
   <React.StrictMode>

@@ -25,31 +25,18 @@ const copyFiles = [
 // all script entry
 // custom by your need
 const entries = {
-  'popup/index': './src/popup/index.tsx',
-  'devtools/index': './src/devtools/index.tsx',
-  'inject/index': './src/inject/index.ts',
-  'content/index': './src/content/index.tsx',
-  'background/index': './src/background/index.ts',
-  'devtools/panel': './src/devtools/panel.tsx',
+  'js/popup': './src/popup/index.tsx',
+  'js/content': './src/content/index.tsx',
+  'js/background': './src/background/index.ts',
 }
 
 // page with html
 // custom by your need
 const pages = [
   new HtmlWebpackPlugin({
-    filename: 'popup/index.html',
-    template: 'src/popup/index.html',
-    chunks: ['popup/index'],
-  }),
-  new HtmlWebpackPlugin({
-    filename: 'devtools/index.html',
-    template: 'src/devtools/index.html',
-    chunks: ['devtools/index'],
-  }),
-  new HtmlWebpackPlugin({
-    filename: 'devtools/panel.html',
-    template: 'src/devtools/panel.html',
-    chunks: ['devtools/panel'],
+    filename: 'page/popup.html',
+    template: 'page/popup.html',
+    chunks: ['js/popup'],
   }),
 ]
 
@@ -64,8 +51,27 @@ const hotReload = isDev
     ]
   : []
 
+const terser = isDev
+  ? []
+  : [
+      new TerserPlugin({
+        terserOptions: {
+          format: {
+            comments: false,
+          },
+        },
+        extractComments: false,
+      }),
+    ]
+
+const babelOptions = {
+  cacheDirectory: true,
+  presets: ['@babel/preset-react', ['@babel/preset-env']],
+}
+
 module.exports = {
   mode: isDev ? 'development' : 'production',
+  // mode: 'development',
   entry: entries,
   output: {
     path: outputPath,
@@ -78,22 +84,20 @@ module.exports = {
         test: /\.js$/,
         use: {
           loader: 'babel-loader',
-          options: {
-            cacheDirectory: true,
-          },
+          options: babelOptions,
         },
         exclude: /node_modules/,
       },
       {
-        test: /\.tsx?$/,
+        test: /\.ts(x?)$/,
         use: [
           {
             loader: 'babel-loader',
-            options: {
-              cacheDirectory: true,
-            },
+            options: babelOptions,
           },
-          'ts-loader',
+          {
+            loader: 'ts-loader',
+          },
         ],
         exclude: /node_modules/,
       },
@@ -115,7 +119,6 @@ module.exports = {
             loader: MiniCssExtractPlugin.loader,
           },
           'css-loader',
-          'postcss-loader',
         ],
       },
       {
@@ -125,7 +128,6 @@ module.exports = {
             loader: MiniCssExtractPlugin.loader,
           },
           'css-loader',
-          'postcss-loader',
           'less-loader',
         ],
       },
@@ -140,7 +142,12 @@ module.exports = {
     new WebpackBar(),
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
-      filename: 'css/[name].css',
+      filename: (pathData) => {
+        const prefix = 'js/'
+        return pathData.chunk.name.includes(prefix)
+          ? `css/${pathData.chunk.name.slice(prefix.length)}.css`
+          : `css/${pathData.chunk.name}.css`
+      },
       chunkFilename: 'css/[name].css',
     }),
   ],
@@ -148,11 +155,7 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   optimization: {
-    minimize: true,
-    minimizer: [
-      new TerserPlugin({
-        extractComments: false,
-      }),
-    ],
+    minimize: !isDev,
+    minimizer: terser,
   },
 }
