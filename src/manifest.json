@@ -30,5 +30,7 @@
 			"js/content.js"
 		],
 		"run_at": "document_end"
-	}]
+	}],
+	"options_page": "page/options.html",
+	"web_accessible_resources": ["assets/*"]
 }

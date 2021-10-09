@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path')
 const outputPath = path.resolve(__dirname, 'dist')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const WebpackBar = require('webpackbar')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
@@ -28,6 +27,7 @@ const entries = {
   'js/popup': './src/popup/index.tsx',
   'js/content': './src/content/index.tsx',
   'js/background': './src/background/index.ts',
+  'js/options': './src/options/index.tsx',
 }
 
 // page with html
@@ -37,6 +37,11 @@ const pages = [
     filename: 'page/popup.html',
     template: 'page/popup.html',
     chunks: ['js/popup'],
+  }),
+  new HtmlWebpackPlugin({
+    filename: 'page/options.html',
+    template: 'page/options.html',
+    chunks: ['js/options'],
   }),
 ]
 
@@ -114,45 +119,25 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-          },
-          'css-loader',
-        ],
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.less$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-          },
-          'css-loader',
-          'less-loader',
-        ],
+        use: ['style-loader', 'css-loader', 'less-loader'],
       },
     ],
   },
   plugins: [
+    new CleanWebpackPlugin(),
     ...pages,
     ...hotReload,
     new CopyWebpackPlugin({
       patterns: copyFiles,
     }),
     new WebpackBar(),
-    new CleanWebpackPlugin(),
-    new MiniCssExtractPlugin({
-      filename: (pathData) => {
-        const prefix = 'js/'
-        return pathData.chunk.name.includes(prefix)
-          ? `css/${pathData.chunk.name.slice(prefix.length)}.css`
-          : `css/${pathData.chunk.name}.css`
-      },
-      chunkFilename: 'css/[name].css',
-    }),
   ],
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.js', 'less'],
   },
   optimization: {
     minimize: !isDev,
