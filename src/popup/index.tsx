@@ -3,8 +3,10 @@ import ReactDOM from 'react-dom'
 import '../style/popup.less'
 
 function App() {
+  // get static files by chrome.runtime.getURL
   const logo = chrome.runtime.getURL('assets/create-crx-app.png')
   const goToOptions = useCallback(() => {
+    // go to options page
     chrome.runtime.openOptionsPage()
   }, [])
   return (

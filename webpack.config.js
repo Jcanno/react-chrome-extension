@@ -34,13 +34,13 @@ const entries = {
 // custom by your need
 const pages = [
   new HtmlWebpackPlugin({
-    filename: 'page/popup.html',
-    template: 'page/popup.html',
+    filename: 'pages/popup.html',
+    template: 'pages/popup.html',
     chunks: ['js/popup'],
   }),
   new HtmlWebpackPlugin({
-    filename: 'page/options.html',
-    template: 'page/options.html',
+    filename: 'pages/options.html',
+    template: 'pages/options.html',
     chunks: ['js/options'],
   }),
 ]
