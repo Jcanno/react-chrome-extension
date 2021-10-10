@@ -15,11 +15,11 @@ root.style.cssText = `bottom: 150px; right: 80px; position: fixed; z-index: 9999
 document.body.appendChild(root)
 
 const btnHeight = 50
-const btnWidth = 200
-const getWindowInner = () => {
+const btnWidth = 250
+const getWindowInnerSize = () => {
   return {
     windowHeight: window.innerHeight - btnHeight,
-    windowWidth: window.innerWidth - btnWidth
+    windowWidth: window.innerWidth - btnWidth,
   }
 }
 const getDomPosition = (dom: HTMLDivElement) => {
@@ -34,11 +34,14 @@ const getDomPosition = (dom: HTMLDivElement) => {
 const getEventTargetCoordinate = (e: MouseEvent) => {
   return {
     x: e.clientX,
-    y: e.clientY
+    y: e.clientY,
   }
 }
-const setDomPosition = (dom: HTMLDivElement, coordinate: Coordinate) => {
+const setDomCoordinate = (dom: HTMLDivElement, coordinate: Coordinate) => {
   Object.assign(dom.style, coordinate)
+}
+const getCalculatedCoordinate = (coordinate: number, edgeSize: number) => {
+  return coordinate > 0 ? (coordinate > edgeSize ? edgeSize : coordinate) : 0
 }
 
 root.onmousedown = function (e: MouseEvent) {
@@ -48,40 +51,32 @@ root.onmousedown = function (e: MouseEvent) {
     moveEvent.stopPropagation()
     moveEvent.preventDefault()
     const { x: curX, y: curY } = getEventTargetCoordinate(moveEvent)
-    const { windowHeight, windowWidth } = getWindowInner()
+    const { windowHeight, windowWidth } = getWindowInnerSize()
     const bottom = startY - curY + startBottom
     const right = startX - curX + startRgight
 
-    setDomPosition(root, {
-      bottom: `${
-        bottom > 0 ? (bottom > windowHeight ? windowHeight : bottom) : 0
-      }px`,
-      right: `${
-        right > 0 ? (right > windowWidth ? windowWidth : right) : 0
-      }px`
+    setDomCoordinate(root, {
+      bottom: `${getCalculatedCoordinate(bottom, windowHeight)}px`,
+      right: `${getCalculatedCoordinate(right, windowWidth)}px`,
     })
   }
 
   const up = () => {
-    document.removeEventListener("mousemove", move)
-    document.removeEventListener("mouseup", up)
+    document.removeEventListener('mousemove', move)
+    document.removeEventListener('mouseup', up)
   }
 
-  document.addEventListener("mousemove", move)
-  document.addEventListener("mouseup", up)
+  document.addEventListener('mousemove', move)
+  document.addEventListener('mouseup', up)
 }
 
-window.addEventListener('resize', function() {
-  const { windowHeight, windowWidth } = getWindowInner()
+window.addEventListener('resize', function () {
+  const { windowHeight, windowWidth } = getWindowInnerSize()
   const { bottom, right } = getDomPosition(root)
 
-  setDomPosition(root, {
-    bottom: `${
-      bottom > 0 ? (bottom > windowHeight ? windowHeight : bottom) : 0
-    }px`,
-    right: `${
-      right > 0 ? (right > windowWidth ? windowWidth : right) : 0
-    }px`
+  setDomCoordinate(root, {
+    bottom: `${getCalculatedCoordinate(bottom, windowHeight)}px`,
+    right: `${getCalculatedCoordinate(right, windowWidth)}px`,
   })
 })
 
@@ -91,14 +86,14 @@ function App() {
       style={{
         width: btnWidth,
         height: btnHeight,
-        lineHeight: '50px',
+        lineHeight: `${btnHeight}px`,
         borderColor: '#6777ef',
-        cursor: 'pointer'
+        cursor: 'pointer',
       }}
       className="crx-btn"
       draggable
     >
-      Created by Extension (Move) 🚀
+      Created by Extension (Moveable) 🚀
     </div>
   )
 }

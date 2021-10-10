@@ -1,6 +1,21 @@
-import React from 'react'
+import React, { useCallback } from 'react'
+import '../style/options.less'
+
+const chromeExtensionUrl = 'https://developer.chrome.com/docs/extensions/'
+
 function App() {
-  return <div className="App">react chrome extension hello</div>
+  const goToExtensionDoc = useCallback(() => {
+    window.open(chromeExtensionUrl)
+  }, [])
+
+  return (
+    <div className="container">
+      <div className="header">create-crx-app</div>
+      <div className="start" onClick={goToExtensionDoc}>
+        Getting Chrome Extension Start <div className="arrow"></div>
+      </div>
+    </div>
+  )
 }
 
 export default App
