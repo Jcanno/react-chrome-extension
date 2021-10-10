@@ -91,7 +91,6 @@ function App() {
         cursor: 'pointer',
       }}
       className="crx-btn"
-      draggable
     >
       Created by Extension (Moveable) 🚀
     </div>

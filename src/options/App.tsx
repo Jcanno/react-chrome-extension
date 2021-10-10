@@ -10,7 +10,7 @@ function App() {
 
   return (
     <div className="container">
-      <div className="header">create-crx-app</div>
+      <div className="title">create-crx-app</div>
       <div className="start" onClick={goToExtensionDoc}>
         Getting Chrome Extension Start <div className="arrow"></div>
       </div>
